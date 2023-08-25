@@ -1,0 +1,52 @@
+version: "3.8"
+services:
+  postgres:
+    image: postgres:15.2-alpine
+    volumes:
+      - ./mount/postgres:/var/lib/postgresql/data
+      - ./ops/postgres:/docker-entrypoint-initdb.d
+    environment:
+      POSTGRES_DB: user
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      DATABASE_TEST_DB: user_test
+      DATABASE_TEST_USER: user_test
+      DATABASE_TEST_PASSWORD: password_test
+    ports:
+      - 5432:5432
+
+  nest:
+    build:
+      dockerfile: Dockerfile
+      context: .
+      # Only will build development stage from our dockerfile
+      target: development
+    # Mount our host Directory to the docker container
+    # Mount (.) current directory to the docker container mapTourist/marker
+    # reflect file changes from host to container
+    volumes:
+      - .:/mapTourist/user/
+      - /mapTourist/user/node_modules
+
+    # Run in Debug Mode: npm run start:debug --> Don't forget to start your vscode debugger!
+    # Run in dev Mode: npm run start:dev
+    command: npm run start:debug
+    depends_on:
+      - postgres
+    environment:
+      NODE_ENV: development
+      JWT_SECRET: 1hard_to_guess_secret7890a
+      PORT: 3000
+      DATABASE_HOSTNAME: postgres
+      DATABASE_DB: user
+      DATABASE_USER: user
+      DATABASE_PASSWORD: password
+      DATABASE_PORT: 5432
+      DATABASE_TEST_DB: user_test
+      DATABASE_TEST_USER: user_test
+      DATABASE_TEST_PASSWORD: password_test
+
+    ports:
+      - 3000:3000
+      # debugging port
+      - 9229:9229

@@ -1,0 +1,59 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2019",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "noImplicitAny": true,
+    "strictBindCallApply": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "paths": {
+      "@app/util-kernel": [
+        "libs/util-kernel/src"
+      ],
+      "@app/util-kernel/*": [
+        "libs/util-kernel/src/*"
+      ],
+      "@app/util-routes": [
+        "libs/util-routes/src"
+      ],
+      "@app/util-routes/*$": [
+        "libs/util-routes/src/$1"
+      ],
+      "@app/error-core": [
+        "libs/error-core/src"
+      ],
+      "@app/error-core/*": [
+        "libs/error-core/src/*"
+      ],
+      "@app/data-generic": [
+        "libs/data-generic/src"
+      ],
+      "@app/data-generic/*": [
+        "libs/data-generic/src/*"
+      ],
+      "@app/error-core-api": [
+        "libs/error-core-api/src"
+      ],
+      "@app/error-core-api/*": [
+        "libs/error-core-api/src/*"
+      ],
+      "@app/domain-core": [
+        "libs/domain-core/src"
+      ],
+      "@app/domain-core/*": [
+        "libs/domain-core/src/*"
+      ],
+    }
+  }
+}

@@ -1,0 +1,7 @@
+entity: UserEntity
+items:
+  user1:
+    id: '7705de3a-4692-4652-beb2-7e142771ba67'
+    pseudo: 'Test12'
+    createdAt: '{{date.recent}}'
+

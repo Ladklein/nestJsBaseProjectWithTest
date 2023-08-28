@@ -6,15 +6,20 @@ import { loadFixtures } from '../../fixture.e2e-spec';
 import { UserErrors } from '@app/error-core';
 import { UserRoutes } from '@app/util-routes';
 
-describe('createUser - userController (e2e)', () => {
-  it(`${UserRoutes.CreateUser} (POST): should return success`, async () => {
+describe('updateUser - userController (e2e)', () => {
+  const validUserId = '7705de3a-4692-4652-beb2-7e142771ba67';
+  const routeForUpdateUser = UserRoutes.UpdateUser.replace(':id', validUserId);
+
+  it(`${UserRoutes.UpdateUser} (POST): should return success`, async () => {
+    await loadFixtures(resolve(__dirname, 'fixtures/updateUser.yml'));
     const validPseudo = 'test5';
+
     const response = await request(getTestApp().getHttpServer())
-      .post(UserRoutes.CreateUser)
+      .post(routeForUpdateUser)
       .send({
         pseudo: validPseudo,
       })
-      .expect(201);
+      .expect(200);
 
     expect(response.body.pseudo).toBe(validPseudo);
     expect(response.body.id).not.toBeNull();
@@ -27,18 +32,23 @@ describe('createUser - userController (e2e)', () => {
     expect(user?.id).toBe(response.body.id);
   });
 
-  it(`${UserRoutes.CreateUser} (POST): bad response with pseudo already exist`, async () => {
-    await loadFixtures(resolve(__dirname, 'fixtures/createUser.yml'));
-    const validPseudo = 'Test12';
+  it(`${UserRoutes.UpdateUser} (POST): bad response with invalid pseudo input : so long`, async () => {
+    await loadFixtures(resolve(__dirname, 'fixtures/updateUser.yml'));
+    const validPseudo = 'a'.repeat(100);
+    const input = {
+      pseudo: validPseudo,
+    };
     const response = await request(getTestApp().getHttpServer())
-      .post(UserRoutes.CreateUser)
-      .send({
-        pseudo: validPseudo,
-      })
+      .post(routeForUpdateUser)
+      .send(input)
       .expect(400);
 
+    const inputError = {
+      userId: validUserId,
+      pseudo: validPseudo,
+    };
     expect(JSON.parse(response.text).error).toBe(
-      `User already exist with pseudo ${validPseudo}`,
+      `Invalid input user ${JSON.stringify(inputError)}`,
     );
     expect(JSON.parse(response.text).statusCode).toBe(400);
     expect(JSON.parse(response.text).message).toBe(
@@ -46,23 +56,24 @@ describe('createUser - userController (e2e)', () => {
     );
   });
 
-  it(`${UserRoutes.CreateUser} (POST): bad response with invalid pseudo input : so long`, async () => {
-    await loadFixtures(resolve(__dirname, 'fixtures/createUser.yml'));
+  it(`${UserRoutes.UpdateUser} (POST): error user not exist`, async () => {
+    await loadFixtures(resolve(__dirname, 'fixtures/updateUser.yml'));
     const validPseudo = 'a'.repeat(100);
     const input = {
       pseudo: validPseudo,
     };
+    const userIdNotExist = 'test';
     const response = await request(getTestApp().getHttpServer())
-      .post(UserRoutes.CreateUser)
+      .post(UserRoutes.UpdateUser.replace(':id', userIdNotExist))
       .send(input)
-      .expect(400);
+      .expect(404);
 
     expect(JSON.parse(response.text).error).toBe(
-      `Invalid input ${JSON.stringify(input)}`,
+      `Cannot find user with id ${userIdNotExist}`,
     );
-    expect(JSON.parse(response.text).statusCode).toBe(400);
+    expect(JSON.parse(response.text).statusCode).toBe(404);
     expect(JSON.parse(response.text).message).toBe(
-      UserErrors.InvalidInputUserError,
+      UserErrors.CannotFindUserError,
     );
   });
 });

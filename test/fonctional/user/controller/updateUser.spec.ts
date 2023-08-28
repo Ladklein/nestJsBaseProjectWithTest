@@ -1,5 +1,4 @@
 import { UserController } from '../../../../src/modules/user/infrastructure/controllers/user.controller';
-import { CreateUserInput } from '../../../../src/modules/user/infrastructure/inputs/CreateUserInput';
 import { Test } from '@nestjs/testing';
 import { getEntities } from '../../../../src/modules/user/infrastructure/entities/typeorm';
 import { getControllers } from '../../../../src/modules/user/infrastructure/controllers';
@@ -10,10 +9,13 @@ import { User } from '../../../../src/modules/user/domain/user';
 import { getMockRepositories } from '../../../../src/modules/user/infrastructure/repositories';
 import { BadRequestException, HttpException } from '@nestjs/common';
 import { err } from 'neverthrow';
+import { UpdateFieldsUserInput } from '../../../../src/modules/user/infrastructure/inputs/UpdateFieldsUserInput';
+import { Uuid } from '@app/util-kernel';
 
-describe('createUser - UserController', () => {
+describe('updateUser - UserController', () => {
   let controller: UserController;
   let userMockRepository: UserMockRepository;
+  const userId = '7705de3a-4692-4652-beb2-7e142771ba67';
   const validePseudo = 'JohnDo01';
   const alreadyExistPseudo = 'JohnDo';
 
@@ -28,17 +30,20 @@ describe('createUser - UserController', () => {
     controller = module.get<UserController>(UserController);
 
     userMockRepository.users = {
-      userId: User.create({
-        pseudo: alreadyExistPseudo,
-      })._unsafeUnwrap(),
+      [userId]: User.create(
+        {
+          pseudo: alreadyExistPseudo,
+        },
+        new Uuid(userId),
+      )._unsafeUnwrap(),
     };
   });
 
   it('should return a new user', async () => {
-    const user: CreateUserInput = {
+    const user: UpdateFieldsUserInput = {
       pseudo: validePseudo,
     };
-    const result = await controller.createUser(user);
+    const result = await controller.updateUser(userId, user);
 
     expect(result?.pseudo).toBe(user.pseudo);
     expect(result?.id).toBeTruthy();
@@ -80,13 +85,6 @@ describe('createUser - UserController', () => {
         error: HttpException,
       },
     },
-    {
-      case: 'User already exist with pseudo in db',
-      inputs: { pseudo: alreadyExistPseudo },
-      excepted: {
-        error: BadRequestException,
-      },
-    },
   ];
   it.each(errorCases)('Error case: $case', async ({ inputs, excepted }) => {
     if (excepted.error === HttpException) {
@@ -95,7 +93,7 @@ describe('createUser - UserController', () => {
         .mockImplementation(async (_user) => err('cannot save user'));
     }
     await expect(
-      controller.createUser({
+      controller.updateUser(userId, {
         pseudo: inputs.pseudo,
       }),
     ).rejects.toBeInstanceOf(excepted.error);

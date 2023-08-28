@@ -4,6 +4,7 @@ import {
   Body,
   Controller,
   Delete,
+  HttpCode,
   HttpException,
   HttpStatus,
   NotFoundException,
@@ -24,7 +25,7 @@ import { CreateUserUsecase } from '../../application/usecases/user/createUser/cr
 import { UpdateFieldsUserInput } from '../inputs/UpdateFieldsUserInput';
 import { User } from '../../domain/user';
 import { UseCaseError } from '@app/util-kernel';
-import { UserRoutes } from "@app/util-routes";
+import { UserRoutes } from '@app/util-routes';
 
 @Controller()
 export class UserController {
@@ -77,6 +78,7 @@ export class UserController {
   }
 
   @Post(UserRoutes.UpdateUser)
+  @HttpCode(200)
   async updateUser(
     @Param('id') userId: string,
     @Body() userFields: UpdateFieldsUserInput,

@@ -7,7 +7,7 @@
 FROM node:18.16-alpine AS development
 
 # Specify our working directory, this is in our container/in our image
-WORKDIR /mapTourist/marker/
+WORKDIR /mapTourist/user/
 
 # Copy the package.jsons from host to container
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
@@ -33,10 +33,10 @@ ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 
 # Set Working Directory
-WORKDIR /mapTourist/marker/
+WORKDIR /mapTourist/user/
 
 # Copy all from development stage
-COPY --from=development /mapTourist/marker/ .
+COPY --from=development /mapTourist/user/ .
 
 EXPOSE 3000
 
